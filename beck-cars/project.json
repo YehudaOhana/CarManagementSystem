@@ -1,0 +1,67 @@
+{
+  "name": "beck-cars",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "beck-cars/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/beck-cars",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "beck-cars/src/main.ts",
+        "tsConfig": "beck-cars/tsconfig.app.json",
+        "assets": ["beck-cars/src/assets"],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "beck-cars:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "beck-cars:build:development"
+        },
+        "production": {
+          "buildTarget": "beck-cars:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "beck-cars/jest.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

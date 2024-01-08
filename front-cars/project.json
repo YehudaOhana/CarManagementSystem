@@ -1,0 +1,69 @@
+{
+  "name": "front-cars",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "front-cars/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/front-cars",
+        "postcssConfig": "/front-cars/postcss.config.js"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "front-cars:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "front-cars:build:development",
+          "hmr": true
+        },
+        "production": {
+          "buildTarget": "front-cars:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "front-cars:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "front-cars:build:development"
+        },
+        "production": {
+          "buildTarget": "front-cars:build:production"
+        }
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{options.reportsDirectory}"],
+      "options": {
+        "reportsDirectory": "../coverage/front-cars"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    }
+  },
+  "tags": []
+}
