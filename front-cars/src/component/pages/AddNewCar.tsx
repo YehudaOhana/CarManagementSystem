@@ -1,24 +1,71 @@
-import { Link } from 'react-router-dom';
-import { useAtom } from 'jotai';
-import useSetNewCar from '../Hooks/setNewCar';
-import useInputNewCar from '../Hooks/inputNewCar';
-import {
-  atomInputNewCar,
-  atomInputNewCarError,
-  atomIsLoadingButton,
-} from '../state/atoms';
+import { Link, useNavigate } from 'react-router-dom';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
+import { tRPC } from '../../services/tRPCClient';
 
-const AddNewCar = () => {
-  const { handleAddNewCar } = useSetNewCar();
-  const { handleInputChange } = useInputNewCar();
-  const [inputNewCar] = useAtom(atomInputNewCar);
-  const [isLoadingButton] = useAtom(atomIsLoadingButton);
-  const [inputNewCarError] = useAtom(atomInputNewCarError);
+const AddNewCar: React.FC = () => {
+  const navigate = useNavigate();
+  const [inputNewCarError, setInputNewCarError] = useState('');
+  const [isLoadingButton, setIsLoadingButton] = useState(false);
+  const [inputNewCar, setInputNewCar] = useState({
+    carNumber: '',
+    model: '',
+    color: '',
+    status: '',
+    driver: '',
+    location: '',
+  });
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setInputNewCar((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleAddNewCar = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const isFormValid = Object.values(inputNewCar).every(
+      (value) => value !== ''
+    );
+    if (!isFormValid) {
+      setInputNewCarError('Please fill in all fields before submitting.');
+      return;
+    }
+
+    try {
+      setIsLoadingButton(true);
+      const alreadyExistsCar = await tRPC.getSpecificCar.query(
+        inputNewCar.carNumber
+      );
+      if (alreadyExistsCar) {
+        setInputNewCarError(`Car "${inputNewCar.carNumber}"  already exists.`);
+        return;
+      }
+      await tRPC.addNewCar.mutate(inputNewCar);
+      navigate('/');
+      setInputNewCarError('');
+      setInputNewCar({
+        carNumber: '',
+        model: '',
+        color: '',
+        status: '',
+        driver: '',
+        location: '',
+      });
+    } catch (error) {
+      console.error('Error adding car:', error);
+    } finally {
+      setIsLoadingButton(false);
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto pt-20 pb-20 mt-8 p-6 bg-white rounded-md shadow-md">
       <form onSubmit={handleAddNewCar} className="space-y-4">
-        {['car_number', 'model', 'color', 'driver', 'location'].map((field) => (
+        {['carNumber', 'model', 'color', 'driver', 'location'].map((field) => (
           <div key={field} className="mb-4">
             <label
               htmlFor={field}
@@ -66,7 +113,7 @@ const AddNewCar = () => {
         >
           {isLoadingButton && (
             <svg
-              className="inline w-6 h-6 text-white animate-spin"
+              className="inline w-6 h-6 text-black animate-spin"
               aria-hidden="true"
               role="status"
               viewBox="0 0 100 101"

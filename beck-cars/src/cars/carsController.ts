@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { publicProcedure } from '../tRPC';
+import chalk from 'chalk';
 import {
   getAllCarsService,
   getSpecificCarService,
@@ -12,8 +13,7 @@ export const getAllCarsController = publicProcedure.query(async () => {
   try {
     return await getAllCarsService();
   } catch (error) {
-    console.error('Error in getAllCarsService procedure:', error);
-    throw error;
+    return 'Not Data';
   }
 });
 
@@ -23,15 +23,14 @@ export const getSpecificCarController = publicProcedure
     try {
       return await getSpecificCarService(opts.input);
     } catch (error) {
-      console.error('Error in getSpecificCarService procedure:', error);
-      throw error;
+      return null;
     }
   });
 
 export const addNewCarController = publicProcedure
   .input(
     z.object({
-      car_number: z.string(),
+      carNumber: z.string(),
       model: z.string(),
       color: z.string(),
       status: z.string(),
@@ -41,9 +40,13 @@ export const addNewCarController = publicProcedure
   )
   .mutation(async (opts) => {
     try {
-      const { car_number, model, color, status, driver, location } = opts.input;
+      const { carNumber, model, color, status, driver, location } = opts.input;
+      // const existingCar = await getSpecificCarService(car_number);
+      // if (existingCar) {
+      //   throw new Error(`Car with car_number '${car_number}' already exists.`);
+      // }
       const addedCar = await addNewCarService({
-        car_number,
+        carNumber,
         model,
         color,
         status,
@@ -72,15 +75,15 @@ export const deleteCarController = publicProcedure
 export const updateCarStatusController = publicProcedure
   .input(
     z.object({
-      car_number: z.string(),
-      new_status: z.string(),
+      carNumber: z.string(),
+      newStatus: z.string(),
     })
   )
   .mutation(async (opts) => {
     try {
       const updatedCarStatus = await updateCarStatusService(
-        opts.input.car_number,
-        opts.input.new_status
+        opts.input.carNumber,
+        opts.input.newStatus
       );
       return updatedCarStatus;
     } catch (error) {

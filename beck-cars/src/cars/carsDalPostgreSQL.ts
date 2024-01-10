@@ -5,27 +5,47 @@ import { CarInterface } from '../interfaces/carInterface';
 
 export const getAllCarsDal = async () => {
   await sequelize.sync();
-  const getAllData = (await Car.findAll()).map((c) => {
-    return c.dataValues;
+  const getAllData = await Car.findAll();
+
+  const values = getAllData.map((c) => {
+    const carData = c.get();
+    return {
+      carNumber: carData.car_number,
+      color: carData.color,
+      driver: carData.driver,
+      location: carData.location,
+      model: carData.model,
+      status: carData.status,
+    };
   });
   console.log(chalk.yellow('All information arrived successfully!!'));
-  return getAllData;
+  return values;
 };
 
 export const getSpecificCarDal = async (carNumber: string) => {
   const findSpecificCar = await Car.findOne({
     where: { car_number: carNumber },
   });
-  console.log(chalk.yellow(`${carNumber} arrived successfully!!`));
-  return findSpecificCar.dataValues;
+  const value = findSpecificCar.get();
+  return {
+    carNumber: value.car_number,
+    color: value.color,
+    driver: value.driver,
+    location: value.location,
+    model: value.model,
+    status: value.status,
+  };
 };
 
 export const addNewCarDal = async (newCar: CarInterface) => {
-  const addNewCar = await Car.create({ ...newCar });
-  console.log(
-    chalk.yellow(`Car added successfully!! : `),
-    addNewCar.dataValues
-  );
+  const addNewCar = await Car.create({
+    car_number: newCar.carNumber,
+    model: newCar.model,
+    color: newCar.color,
+    status: newCar.status,
+    driver: newCar.driver,
+    location: newCar.location,
+  });
   return addNewCar.dataValues;
 };
 
