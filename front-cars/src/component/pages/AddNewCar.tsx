@@ -27,13 +27,6 @@ const AddNewCar: React.FC = () => {
 
   const handleAddNewCar = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const isFormValid = Object.values(inputNewCar).every(
-      (value) => value !== ''
-    );
-    if (!isFormValid) {
-      setInputNewCarError('Please fill in all fields before submitting.');
-      return;
-    }
 
     try {
       setIsLoadingButton(true);
@@ -80,6 +73,7 @@ const AddNewCar: React.FC = () => {
               name={field}
               value={inputNewCar[field as keyof typeof inputNewCar]}
               onChange={handleInputChange}
+              required
             />
           </div>
         ))}
@@ -96,6 +90,7 @@ const AddNewCar: React.FC = () => {
             name="status"
             value={inputNewCar.status}
             onChange={handleInputChange}
+            required
           >
             <option value="" disabled>
               Select status
