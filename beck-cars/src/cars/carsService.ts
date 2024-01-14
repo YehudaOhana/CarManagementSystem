@@ -6,40 +6,59 @@ import {
   getSpecificCarDal,
   updateCarStatusDal,
 } from './carsDalPostgreSQL';
-// import RedisClient from '../redis/redisCar';
+import {
+  addNewCarRedis,
+  deleteCarRedis,
+  getAllDataRedis,
+  getSpecificCarRedis,
+  updateCarStatusRedis,
+} from './carsDalRedis';
+import chalk from 'chalk';
 
 export const getAllCarsService = async () => {
-  // const key = `getAllUser:getAllUsersService`;
-  // const dataFromRedis = await RedisClient.get(key);
-  // if (dataFromRedis) {
-  //   console.log('Data retrieved from Redis');
-  //   return JSON.parse(dataFromRedis);
-  // }
-  const cars = await getAllCarsDal();
-  // await RedisClient.setEx(key, 200, JSON.stringify(users));
-  // console.log('Data stored in Redis');
-  return cars;
+  const carsFromDB = getAllCarsDal().then((data) => {
+    console.log(chalk.blue('Source: DB'));
+    return data;
+  });
+  const carsFromRedis = getAllDataRedis().then((data) => {
+    console.log(chalk.magenta('Source: Redis'));
+    return data;
+  });
+  return await Promise.any([carsFromDB, carsFromRedis]);
 };
 
 export const getSpecificCarService = async (carNumber: string) => {
-  const specificCar = await getSpecificCarDal(carNumber);
-  return specificCar;
+  const specificCarDB = await getSpecificCarDal(carNumber).then((data) => {
+    console.log(chalk.blue('SourceSpecificCar: DB'));
+    return data;
+  });
+  const specificCarRedis = await getSpecificCarRedis(carNumber).then((data) => {
+    console.log(chalk.magenta('SourceSpecificCar: Redis'));
+    return data;
+  });
+  return await Promise.any([specificCarDB, specificCarRedis]);
 };
 
 export const addNewCarService = async (newCar: CarInterface) => {
-  const addedCar = await addNewCarDal(newCar);
-  return addedCar;
+  const addedCarDB = await addNewCarDal(newCar);
+  const addedCarRedis = await addNewCarRedis(newCar);
+  return { DB: addedCarDB, Redis: addedCarRedis };
 };
 
 export const deleteCarService = async (carNumber: string) => {
-  const specificCar = await deleteCarDal(carNumber);
-  return specificCar;
+  const deletedCarDB = await deleteCarDal(carNumber);
+  const deletedCarRedis = await deleteCarRedis(carNumber);
+  return { DB: deletedCarDB, Redis: deletedCarRedis };
 };
 
 export const updateCarStatusService = async (
   carNumber: string,
   newStatus: string
 ) => {
-  const updatedCarStatus = await updateCarStatusDal(carNumber, newStatus);
-  return updatedCarStatus;
+  const updatedCarStatusDB = await updateCarStatusDal(carNumber, newStatus);
+  const updatedCarStatusRedis = await updateCarStatusRedis(
+    carNumber,
+    newStatus
+  );
+  return { DB: updatedCarStatusDB, Redis: updatedCarStatusRedis };
 };

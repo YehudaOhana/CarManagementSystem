@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { publicProcedure } from '../tRPC';
-import chalk from 'chalk';
 import {
   getAllCarsService,
   getSpecificCarService,

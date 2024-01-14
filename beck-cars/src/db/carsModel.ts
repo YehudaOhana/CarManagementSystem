@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
-import { sequelize } from './connectPostgreSQL';
 import { CarInterfaceDB } from '../interfaces/carInterface';
+import { sequelize } from './postgreSQLConnect';
 
 export const Car = sequelize.define<Model<CarInterfaceDB>>(
   'cars',

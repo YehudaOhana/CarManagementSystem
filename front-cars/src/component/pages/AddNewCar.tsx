@@ -95,8 +95,8 @@ const AddNewCar: React.FC = () => {
             <option value="" disabled>
               Select status
             </option>
-            <option value="In Use:">In Use:</option>
-            <option value="Maintenance:">Maintenance:</option>
+            <option value="In Use">In Use</option>
+            <option value="Maintenance">Maintenance</option>
             <option value="Out of Service">Out of Service</option>
           </select>
         </div>

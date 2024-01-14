@@ -1,5 +1,5 @@
-// LoginForm.js
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -12,8 +12,8 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white p-8 shadow-md rounded-md w-96">
+    <div className="flex items-center justify-center h-screen">
+      <div className="bg-white p-8 shadow-md rounded-md w-96 ">
         <h2 className="text-2xl font-semibold mb-4">Login</h2>
         <form onSubmit={handleLogin}>
           <div className="mb-4">
@@ -29,7 +29,7 @@ const LoginForm = () => {
               name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 p-3 border rounded-md w-full focus:outline-none focus:border-blue-500"
+              className="mt-1 p-3 border rounded-md w-full bg-cyan-100 focus:outline-none focus:border-blue-500"
               required
             />
           </div>
@@ -46,13 +46,16 @@ const LoginForm = () => {
               name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 p-3 border rounded-md w-full focus:outline-none focus:border-blue-500"
+              className="mt-1 p-3 border rounded-md w-full bg-cyan-100 focus:outline-none focus:border-blue-500"
               required
             />
+            <Link to={'/registerForm'} className="text-red-500">
+              Do not have an account?
+            </Link>
           </div>
           <button
             type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-400 focus:outline-none focus:bg-blue-600"
+            className="bg-cyan-500 text-white py-2 px-4 rounded-md hover:bg-blue-400 focus:outline-none focus:bg-blue-600"
           >
             Login
           </button>

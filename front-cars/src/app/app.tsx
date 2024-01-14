@@ -9,18 +9,16 @@ import LoginForm from '../component/pages/Login';
 
 export function App() {
   return (
-    <>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/specificCar/:CarNumber" element={<SpecificCar />} />
-          <Route path="/addNewCar" element={<AddNewCar />} />
-          <Route path="/mapCars" element={<MapCars />} />
-          <Route path="/registerForm" element={<RegisterForm />} />
-          <Route path="/loginForm" element={<LoginForm />} />
-        </Route>
-      </Routes>
-    </>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/specificCar/:CarNumber" element={<SpecificCar />} />
+        <Route path="/addNewCar" element={<AddNewCar />} />
+        <Route path="/mapCars" element={<MapCars />} />
+        <Route path="/registerForm" element={<RegisterForm />} />
+        <Route path="/loginForm" element={<LoginForm />} />
+      </Route>
+    </Routes>
   );
 }
 

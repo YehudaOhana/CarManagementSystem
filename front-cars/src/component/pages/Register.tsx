@@ -1,5 +1,5 @@
-// RegisterForm.js
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const RegisterForm = () => {
   const [username, setUsername] = useState('');
@@ -8,7 +8,20 @@ const RegisterForm = () => {
 
   const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Add your registration logic here
+
+    try {
+      await createUserMutation({
+        variables: {
+          input: {
+            users: newUser,
+          },
+        },
+      });
+      console.log('User created successfully!');
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
+
     console.log('Registering with:', username, email, password);
   };
 
@@ -30,7 +43,7 @@ const RegisterForm = () => {
               name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 p-3 border rounded-md w-full focus:outline-none focus:border-blue-500"
+              className="mt-1 p-3 border rounded-md w-full bg-cyan-100 focus:outline-none focus:border-blue-500"
               required
             />
           </div>
@@ -47,7 +60,7 @@ const RegisterForm = () => {
               name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 p-3 border rounded-md w-full focus:outline-none focus:border-blue-500"
+              className="mt-1 p-3 border rounded-md w-full bg-cyan-100 focus:outline-none focus:border-blue-500"
               required
             />
           </div>
@@ -64,9 +77,12 @@ const RegisterForm = () => {
               name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 p-3 border rounded-md w-full focus:outline-none focus:border-blue-500"
+              className="mt-1 p-3 border rounded-md w-full bg-cyan-100 focus:outline-none focus:border-blue-500"
               required
             />
+            <Link to={'/loginForm'} className="text-red-500">
+              I have an account
+            </Link>
           </div>
           <button
             type="submit"

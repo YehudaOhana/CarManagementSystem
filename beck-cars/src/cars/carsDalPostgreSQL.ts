@@ -1,4 +1,4 @@
-import { sequelize } from '../db/connectPostgreSQL';
+import { sequelize } from '../db/postgreSQLConnect';
 import { Car } from '../db/carsModel';
 import chalk from 'chalk';
 import { CarInterface } from '../interfaces/carInterface';
@@ -50,7 +50,7 @@ export const addNewCarDal = async (newCar: CarInterface) => {
 };
 
 export const deleteCarDal = async (carNumber: string) => {
-  const deletedCar = await Car.destroy({
+  await Car.destroy({
     where: { car_number: carNumber },
   });
   console.log(chalk.yellow(`${carNumber} deleted successfully!!`));
@@ -61,10 +61,7 @@ export const updateCarStatusDal = async (
   carNumber: string,
   newStatus: string
 ) => {
-  const updatedCar = await Car.update(
-    { status: newStatus },
-    { where: { car_number: carNumber } }
-  );
+  await Car.update({ status: newStatus }, { where: { car_number: carNumber } });
   console.log(chalk.yellow(`${carNumber} status updated successfully!!`));
   return `Car number '${carNumber}' status updated to '${newStatus}' successfully!!`;
 };

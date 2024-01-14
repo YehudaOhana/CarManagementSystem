@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { PropagateLoader } from 'react-spinners';
-import { CarInterface } from '../../../../beck-cars/src/interfaces/carInterface';
 import { tRPC } from '../../services/tRPCClient';
 import CreateCardCars from '../common/CreateCardCar';
+import { CarInterface } from 'beck-cars/src/interfaces/carInterface';
 
 const HomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,6 +14,7 @@ const HomePage: React.FC = () => {
       const res = await tRPC.getAllCars.query();
       if (res !== 'Not Data') setDataAllCars(res);
     } catch (error) {
+      console.error('Error deleting car:', error);
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +64,7 @@ const HomePage: React.FC = () => {
           />
         </div>
       ) : (
-        <div className="container mx-auto py-20 grid gap-4 lg:grid-cols-5">
+        <div className="container mx-auto py-20 grid gap-4 lg:grid-cols-4">
           {dataAllCars.map((item: CarInterface) => (
             <CreateCardCars
               key={item.carNumber}
