@@ -7,24 +7,15 @@ import {
   updateCarStatusDal,
 } from './carsDalPostgreSQL';
 import {
-  addNewCarRedis,
   deleteCarRedis,
-  getAllDataRedis,
   getSpecificCarRedis,
   updateCarStatusRedis,
 } from './carsDalRedis';
 import chalk from 'chalk';
 
 export const getAllCarsService = async () => {
-  const carsFromDB = getAllCarsDal().then((data) => {
-    console.log(chalk.blue('Source: DB'));
-    return data;
-  });
-  const carsFromRedis = getAllDataRedis().then((data) => {
-    console.log(chalk.magenta('Source: Redis'));
-    return data;
-  });
-  return await Promise.any([carsFromDB, carsFromRedis]);
+  const allCars = getAllCarsDal();
+  return allCars;
 };
 
 export const getSpecificCarService = async (carNumber: string) => {
@@ -40,9 +31,8 @@ export const getSpecificCarService = async (carNumber: string) => {
 };
 
 export const addNewCarService = async (newCar: CarInterface) => {
-  const addedCarDB = await addNewCarDal(newCar);
-  const addedCarRedis = await addNewCarRedis(newCar);
-  return { DB: addedCarDB, Redis: addedCarRedis };
+  const addedCar = await addNewCarDal(newCar);
+  return addedCar;
 };
 
 export const deleteCarService = async (carNumber: string) => {
