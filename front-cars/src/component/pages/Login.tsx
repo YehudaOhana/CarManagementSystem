@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { LOGIN } from '../../graphQL/schemaUsers';
 
@@ -15,6 +15,13 @@ const LoginForm = () => {
     password: '',
   });
 
+  useEffect(() => {
+    if (tokenStorage) {
+      navigate('/');
+      return;
+    }
+  }, []);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputLogin({
       ...inputLogin,
@@ -25,10 +32,6 @@ const LoginForm = () => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsLoadingButton(true);
     e.preventDefault();
-    if (tokenStorage) {
-      navigate('/');
-      return;
-    }
     try {
       const { data } = await loginMutation({
         variables: {
@@ -37,13 +40,14 @@ const LoginForm = () => {
         },
       });
       const jwt = data.authenticate.jwtToken;
-      localStorage.setItem('tokenKey', jwt);
-      const name = data.authenticate.query.userByEmail.name;
-      localStorage.setItem('nameKey', name);
-      navigate('/');
-    } catch (ApolloError) {
-      // setInputSearchError();
-      console.log('Error login user:', ApolloError);
+      if (jwt) {
+        localStorage.setItem('tokenKey', jwt);
+        const name = data.authenticate.query.userByEmail.name;
+        localStorage.setItem('nameKey', name);
+        navigate('/');
+      } else setInputSearchError('Invalid email or password');
+    } catch (error) {
+      console.log('Error login user:', error);
     } finally {
       setIsLoadingButton(false);
     }

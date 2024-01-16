@@ -1,18 +1,27 @@
 import { CREATE_USER } from '../../graphQL/schemaUsers';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
+import { isGraphQLError } from '../../graphQL/errorUtils';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
   const [isLoadingButton, setIsLoadingButton] = useState(false);
-  const [inputSearchError, setInputSearchError] = useState('rrrr');
+  const [inputSearchError, setInputSearchError] = useState('');
   const [createUser] = useMutation(CREATE_USER);
+  const tokenStorage = localStorage.getItem('tokenKey');
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
     password: '',
   });
+
+  useEffect(() => {
+    if (tokenStorage) {
+      navigate('/');
+      return;
+    }
+  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNewUser({
@@ -35,11 +44,26 @@ const RegisterForm = () => {
       console.log('User created successfully!');
       navigate('/loginForm');
     } catch (error) {
-      setInputSearchError('user exits');
+      if (isGraphQLError(error)) {
+        if (
+          error.message.includes(
+            'duplicate key value violates unique constraint'
+          )
+        ) {
+          setInputSearchError('User already registered. Go to the login page');
+        } else {
+          setInputSearchError('An error occurred during registration.');
+          console.error('Error during registration:', error.message);
+        }
+      } else {
+        setInputSearchError('An error occurred during registration.');
+        console.error('Error during registration:', error);
+      }
     } finally {
       setIsLoadingButton(false);
     }
   };
+
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="bg-white p-8 shadow-md rounded-md w-96">
@@ -127,7 +151,7 @@ const RegisterForm = () => {
           to={'/loginForm'}
           className="block mt-4 text-blue-500 hover:text-yellow-500"
         >
-          I have an account
+          Go to login
         </Link>
       </div>
     </div>
