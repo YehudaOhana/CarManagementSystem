@@ -2,7 +2,7 @@ import { client } from '../redis/connectRedis';
 import { getAllCarsDal } from './carsDalPostgreSQL';
 
 export const getSpecificCarRedis = async (carNumber: string) => {
-  const cacheKey = 'getSpecificCar';
+  const cacheKey = 'specificCarList';
   try {
     const cachedData = await client.get(cacheKey);
     const allCarRedis = cachedData ? JSON.parse(cachedData) : [];
@@ -26,13 +26,14 @@ export const getSpecificCarRedis = async (carNumber: string) => {
 };
 
 export const deleteCarRedis = async (carNumber) => {
+  const cacheKey = 'specificCarList';
   try {
-    const specificCarRedis = await getAllDataRedis();
-    const updatedData = allDataRedis.filter(
+    const cachedData = await client.get(cacheKey);
+    const allCarRedis = cachedData ? JSON.parse(cachedData) : [];
+    const updatedData = allCarRedis.filter(
       (car) => car.carNumber !== carNumber
     );
-    await client.set('getAllData', JSON.stringify(updatedData));
-    return `Car number '${carNumber}' deleted successfully from Redis!!`;
+    await client.set(cacheKey, JSON.stringify(updatedData));
   } catch (error) {
     console.error('Error deleting car from Redis:', error);
     return Promise.reject(error);
@@ -40,13 +41,14 @@ export const deleteCarRedis = async (carNumber) => {
 };
 
 export const updateCarStatusRedis = async (carNumber, newStatus) => {
+  const cacheKey = 'specificCarList';
   try {
-    const allDataRedis = await getAllDataRedis();
-    const updatedData = allDataRedis.map((car) =>
+    const cachedData = await client.get(cacheKey);
+    const allCarRedis = cachedData ? JSON.parse(cachedData) : [];
+    const updatedData = allCarRedis.map((car) =>
       car.carNumber === carNumber ? { ...car, status: newStatus } : car
     );
-    await client.set('getAllData', JSON.stringify(updatedData));
-    return `Car number '${carNumber}' status updated to '${newStatus}' successfully in Redis!!`;
+    await client.set(cacheKey, JSON.stringify(updatedData));
   } catch (error) {
     console.error('Error updating car status in Redis:', error);
     return Promise.reject(error);
