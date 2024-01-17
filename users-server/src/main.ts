@@ -14,7 +14,7 @@ app.use(
     graphqlRoute: '/graphql',
     graphiqlRoute: '/graphiql',
     jwtPgTypeIdentifier: 'schema_users.jwt_token',
-    jwtSecret: 'krjgfoioiudiure',
+    jwtSecret: process.env.JWT_SECRET,
   })
 );
 

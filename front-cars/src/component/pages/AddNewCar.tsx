@@ -1,9 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 import { tRPC } from '../../services/tRPCClient';
+import { useAtom } from 'jotai';
+import { atomToken } from '../../state/atoms';
 
 const AddNewCar: React.FC = () => {
   const navigate = useNavigate();
+  const [token] = useAtom(atomToken);
   const [inputNewCarError, setInputNewCarError] = useState('');
   const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [inputNewCar, setInputNewCar] = useState({
@@ -27,17 +30,21 @@ const AddNewCar: React.FC = () => {
 
   const handleAddNewCar = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    if (!token) {
+      navigate(`/loginForm`);
+      return;
+    }
     try {
       setIsLoadingButton(true);
-      const alreadyExistsCar = await tRPC.getSpecificCar.query(
-        inputNewCar.carNumber
-      );
+      const alreadyExistsCar = await tRPC.getSpecificCar.query({
+        carNumber: inputNewCar.carNumber,
+        token: token,
+      });
       if (alreadyExistsCar) {
         setInputNewCarError(`Car "${inputNewCar.carNumber}"  already exists.`);
         return;
       }
-      await tRPC.addNewCar.mutate(inputNewCar);
+      await tRPC.addNewCar.mutate({ token: token, newCar: inputNewCar });
       navigate('/');
       setInputNewCarError('');
       setInputNewCar({

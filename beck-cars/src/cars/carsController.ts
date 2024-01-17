@@ -8,19 +8,22 @@ import {
   addNewCarService,
 } from './carsService';
 
-export const getAllCarsController = publicProcedure.query(async () => {
-  try {
-    return await getAllCarsService();
-  } catch (error) {
-    return 'Not Data';
-  }
-});
-
-export const getSpecificCarController = publicProcedure
+export const getAllCarsController = publicProcedure
   .input(z.string())
   .query(async (opts) => {
     try {
-      return await getSpecificCarService(opts.input);
+      return await getAllCarsService(opts.input);
+    } catch (error) {
+      return 'Not Data';
+    }
+  });
+
+export const getSpecificCarController = publicProcedure
+  .input(z.object({ carNumber: z.string(), token: z.string() }))
+  .query(async (opts) => {
+    const { carNumber, token } = opts.input;
+    try {
+      return await getSpecificCarService(carNumber, token);
     } catch (error) {
       return null;
     }
@@ -29,22 +32,24 @@ export const getSpecificCarController = publicProcedure
 export const addNewCarController = publicProcedure
   .input(
     z.object({
-      carNumber: z.string(),
-      model: z.string(),
-      color: z.string(),
-      status: z.string(),
-      driver: z.string(),
-      location: z.string(),
+      token: z.string(),
+      newCar: z.object({
+        carNumber: z.string(),
+        model: z.string(),
+        color: z.string(),
+        status: z.string(),
+        driver: z.string(),
+        location: z.string(),
+      }),
     })
   )
   .mutation(async (opts) => {
     try {
-      const { carNumber, model, color, status, driver, location } = opts.input;
-      // const existingCar = await getSpecificCarService(car_number);
-      // if (existingCar) {
-      //   throw new Error(`Car with car_number '${car_number}' already exists.`);
-      // }
-      const addedCar = await addNewCarService({
+      const {
+        token,
+        newCar: { carNumber, model, color, status, driver, location },
+      } = opts.input;
+      const addedCar = await addNewCarService(token, {
         carNumber,
         model,
         color,
@@ -60,10 +65,11 @@ export const addNewCarController = publicProcedure
   });
 
 export const deleteCarController = publicProcedure
-  .input(z.string())
+  .input(z.object({ carNumber: z.string(), token: z.string() }))
   .mutation(async (opts) => {
+    const { carNumber, token } = opts.input;
     try {
-      const deletedCar = await deleteCarService(opts.input);
+      const deletedCar = await deleteCarService(carNumber, token);
       return deletedCar;
     } catch (error) {
       console.error('Error in getSpecificCarService procedure:', error);
@@ -74,15 +80,23 @@ export const deleteCarController = publicProcedure
 export const updateCarStatusController = publicProcedure
   .input(
     z.object({
-      carNumber: z.string(),
-      newStatus: z.string(),
+      token: z.string(),
+      updatedStatus: z.object({
+        carNumber: z.string(),
+        newStatus: z.string(),
+      }),
     })
   )
   .mutation(async (opts) => {
     try {
+      const {
+        token,
+        updatedStatus: { carNumber, newStatus },
+      } = opts.input;
+      const newStatusData = { carNumber, newStatus };
       const updatedCarStatus = await updateCarStatusService(
-        opts.input.carNumber,
-        opts.input.newStatus
+        token,
+        newStatusData
       );
       return updatedCarStatus;
     } catch (error) {

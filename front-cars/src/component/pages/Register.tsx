@@ -3,13 +3,15 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { isGraphQLError } from '../../graphQL/errorUtils';
+import { useAtom } from 'jotai';
+import { atomToken } from '../../state/atoms';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
   const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [inputSearchError, setInputSearchError] = useState('');
   const [createUser] = useMutation(CREATE_USER);
-  const tokenStorage = localStorage.getItem('tokenKey');
+  const [token] = useAtom(atomToken);
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
@@ -17,7 +19,7 @@ const RegisterForm = () => {
   });
 
   useEffect(() => {
-    if (tokenStorage) {
+    if (token) {
       navigate('/');
       return;
     }

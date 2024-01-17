@@ -1,17 +1,19 @@
+import { useAtom } from 'jotai';
 import { tRPC } from '../../services/tRPCClient';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { atomName, atomToken } from '../../state/atoms';
 
 const Header = () => {
   const navigate = useNavigate();
   const [rotation, setRotation] = useState(0);
   const [inputSearchError, setInputSearchError] = useState('');
   const [inputSearch, setInputSearch] = useState('');
-  const [titleIsContact, setTitleIsConnected] = useState('Login');
-  // const [isConnected, setIsConnected] = useState(false);
+  const [titleIsConnected, setTitleIsConnected] = useState('Login');
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [isLoadingButton, setIsLoadingButton] = useState(false);
-  const tokenStorage = localStorage.getItem('tokenKey');
-  const nameStorage = localStorage.getItem('nameKey');
+  const [token, setToken] = useAtom(atomToken);
+  const [name, setName] = useAtom(atomName);
 
   const handleIconClick = () => {
     setRotation(rotation + 99999999999999);
@@ -21,7 +23,10 @@ const Header = () => {
     if (inputSearch === '') return setInputSearchError('Enter Car Number');
     setIsLoadingButton(true);
     try {
-      const res = await tRPC.getSpecificCar.query(inputSearch);
+      const res = await tRPC.getSpecificCar.query({
+        carNumber: inputSearch,
+        token: token,
+      });
       if (res && res.carNumber === inputSearch) {
         navigate(`specificCar/${inputSearch}`);
         setInputSearchError('');
@@ -35,16 +40,31 @@ const Header = () => {
   };
 
   const handleTitleConnected = () => {
-    tokenStorage ? navigate(`/addNewCar`) : navigate(`/loginForm`);
+    if (token) {
+      setShowLogoutConfirmation(true);
+    } else {
+      navigate(`/loginForm`);
+    }
+  };
+
+  const handleLogout = () => {
+    setToken('');
+    setName('');
+    setShowLogoutConfirmation(false);
+    navigate('/loginForm');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirmation(false);
   };
 
   useEffect(() => {
-    if (tokenStorage && nameStorage) {
-      setTitleIsConnected(nameStorage);
+    if (token && name) {
+      setTitleIsConnected(name);
     } else {
       setTitleIsConnected('Login');
     }
-  }, [tokenStorage]);
+  }, [token]);
 
   return (
     <nav className="py-5  bg-cyan-500 fixed top-0 left-0 right-0">
@@ -65,7 +85,7 @@ const Header = () => {
             />
           </svg>
           <Link
-            to={tokenStorage ? `/` : `/loginForm`}
+            to={token ? `/` : `/loginForm`}
             className="font-bold text-xl hover:text-white active:text-yellow-500"
           >
             Car Management System
@@ -73,7 +93,7 @@ const Header = () => {
         </section>
         <section>
           <ul className="md:space-x-8 space-x-8 text-gray-900 font-semibold hidden md:flex">
-            {tokenStorage && (
+            {token && (
               <div className="md:space-x-8 space-x-8 text-gray-900 font-semibold hidden md:flex">
                 <li>
                   <div>
@@ -152,13 +172,30 @@ const Header = () => {
                 </li>
               </div>
             )}
-            <li>
-              <button
-                onClick={handleTitleConnected}
-                className="bg-gray-900 px-4 py-1 rounded-xl text-white hover:bg-white hover:text-gray-900 active:text-yellow-500"
-              >
-                {titleIsContact}
-              </button>
+            <li className="relative group">
+              {showLogoutConfirmation ? (
+                <div className="h-6 p-1 px-5 text-sm font-medium text-white bg-cyan-500 rounded-3xl border border-gray-200  hover:text-gray-900 focus:z-10  inline-flex items-center">
+                  <button
+                    onClick={handleLogout}
+                    className="  text-sm text-black  hover:text-red-500"
+                  >
+                    Logout
+                  </button>
+                  <button
+                    onClick={cancelLogout}
+                    className="pl-2 text-sm text-black  hover:text-white"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleTitleConnected}
+                  className="h-6 p-1 px-5 text-sm font-medium text-white bg-black rounded-3xl   hover:bg-cyan-500 hover:text-gray-900 focus:z-10  inline-flex items-center"
+                >
+                  {titleIsConnected}
+                </button>
+              )}
             </li>
           </ul>
         </section>

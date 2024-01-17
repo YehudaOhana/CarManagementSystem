@@ -1,7 +1,8 @@
+import { newStatusInterface } from '../interfaces/carInterface';
 import { client } from '../redis/connectRedis';
 import { getAllCarsDal } from './carsDalPostgreSQL';
 
-export const getSpecificCarRedis = async (carNumber: string) => {
+export const getSpecificCarRedis = async (carNumber: string, token: string) => {
   const cacheKey = 'specificCarList';
   try {
     const cachedData = await client.get(cacheKey);
@@ -12,7 +13,7 @@ export const getSpecificCarRedis = async (carNumber: string) => {
     if (specificCarRedis) {
       return specificCarRedis;
     }
-    const allDataDB = await getAllCarsDal();
+    const allDataDB = await getAllCarsDal(token);
     const specificCarDB = allDataDB.find((car) => car.carNumber === carNumber);
     if (specificCarDB) {
       allCarRedis.push(specificCarDB);
@@ -25,7 +26,7 @@ export const getSpecificCarRedis = async (carNumber: string) => {
   }
 };
 
-export const deleteCarRedis = async (carNumber) => {
+export const deleteCarRedis = async (carNumber: string, token: string) => {
   const cacheKey = 'specificCarList';
   try {
     const cachedData = await client.get(cacheKey);
@@ -40,13 +41,18 @@ export const deleteCarRedis = async (carNumber) => {
   }
 };
 
-export const updateCarStatusRedis = async (carNumber, newStatus) => {
+export const updateCarStatusRedis = async (
+  updatedStatus: newStatusInterface,
+  token: string
+) => {
   const cacheKey = 'specificCarList';
   try {
     const cachedData = await client.get(cacheKey);
     const allCarRedis = cachedData ? JSON.parse(cachedData) : [];
     const updatedData = allCarRedis.map((car) =>
-      car.carNumber === carNumber ? { ...car, status: newStatus } : car
+      car.carNumber === updatedStatus.carNumber
+        ? { ...car, status: updatedStatus.newStatus }
+        : car
     );
     await client.set(cacheKey, JSON.stringify(updatedData));
   } catch (error) {

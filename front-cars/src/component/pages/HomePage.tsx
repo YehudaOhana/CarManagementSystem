@@ -3,16 +3,25 @@ import { PropagateLoader } from 'react-spinners';
 import { tRPC } from '../../services/tRPCClient';
 import CreateCardCars from '../common/CreateCardCar';
 import { CarInterface } from 'beck-cars/src/interfaces/carInterface';
+import { useNavigate } from 'react-router-dom';
+import { useAtom } from 'jotai';
+import { atomToken } from '../../state/atoms';
 
 const HomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [dataAllCars, setDataAllCars] = useState<CarInterface[]>([]);
+  const navigate = useNavigate();
+  const [token] = useAtom(atomToken);
 
   const getAllCars = async () => {
+    if (!token) {
+      navigate(`/loginForm`);
+      return;
+    }
     try {
       setIsLoading(true);
-      const res = await tRPC.getAllCars.query();
-      if (res !== 'Not Data') setDataAllCars(res);
+      const res = await tRPC.getAllCars.query(token);
+      if (res !== 'Not Data' && res !== undefined) setDataAllCars(res);
     } catch (error) {
       console.error('Error deleting car:', error);
     } finally {
@@ -21,8 +30,15 @@ const HomePage: React.FC = () => {
   };
 
   const handleDeleteCar = async (carNumber: string) => {
+    if (!token) {
+      navigate(`/loginForm`);
+      return;
+    }
     try {
-      await tRPC.deleteCar.mutate(carNumber);
+      await tRPC.deleteCar.mutate({
+        carNumber: carNumber,
+        token: token,
+      });
       console.log('Car deleted successfully:', carNumber);
       setDataAllCars((prevCars) =>
         prevCars.filter((newData) => newData.carNumber !== carNumber)
@@ -33,12 +49,18 @@ const HomePage: React.FC = () => {
   };
 
   const handleUpdateStatus = async (carNumber: string, newStatus: string) => {
+    if (!token) {
+      navigate(`/loginForm`);
+      return;
+    }
     try {
       await tRPC.updateCarStatus.mutate({
-        carNumber: carNumber,
-        newStatus: newStatus,
+        token: token,
+        updatedStatus: {
+          carNumber: carNumber,
+          newStatus: newStatus,
+        },
       });
-
       setDataAllCars((prevData) => {
         return prevData.map((car) =>
           car.carNumber === carNumber ? { ...car, status: newStatus } : car
@@ -51,7 +73,7 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     getAllCars();
-  }, []);
+  }, [token]);
 
   return (
     <div className="pt-20">

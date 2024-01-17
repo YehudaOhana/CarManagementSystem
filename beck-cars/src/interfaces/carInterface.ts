@@ -15,3 +15,8 @@ export interface CarInterfaceDB {
   driver: string;
   location: string;
 }
+
+export interface newStatusInterface {
+  carNumber: string;
+  newStatus: string;
+}

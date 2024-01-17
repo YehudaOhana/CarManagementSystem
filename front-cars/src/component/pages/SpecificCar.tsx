@@ -3,6 +3,8 @@ import { tRPC } from '../../services/tRPCClient';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { PropagateLoader } from 'react-spinners';
+import { useAtom } from 'jotai';
+import { atomToken } from '../../state/atoms';
 
 const SpecificCar: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,11 +15,19 @@ const SpecificCar: React.FC = () => {
   );
   const params = useParams<{ CarNumber: string }>();
   const navigate = useNavigate();
+  const [token] = useAtom(atomToken);
 
   const getSpecificCar = async (CarNumber: string) => {
+    if (!token) {
+      navigate(`/loginForm`);
+      return;
+    }
     setIsLoading(true);
     try {
-      const res = await tRPC.getSpecificCar.query(CarNumber);
+      const res = await tRPC.getSpecificCar.query({
+        carNumber: CarNumber,
+        token: token,
+      });
       setDataSpecificCar(res);
     } catch (error) {
       return null;
@@ -27,9 +37,16 @@ const SpecificCar: React.FC = () => {
   };
 
   const handleDeleteCar = async (carNumber: string) => {
+    if (!token) {
+      navigate(`/loginForm`);
+      return;
+    }
     setIsLoadingButton(true);
     try {
-      const result = await tRPC.deleteCar.mutate(carNumber);
+      const result = await tRPC.deleteCar.mutate({
+        carNumber: carNumber,
+        token: token,
+      });
       console.log('Car deleted successfully:', carNumber);
       navigate(`/`);
       return result;
@@ -41,11 +58,18 @@ const SpecificCar: React.FC = () => {
   };
 
   const handleUpdateStatus = async (carNumber: string, newStatus: string) => {
+    if (!token) {
+      navigate(`/loginForm`);
+      return;
+    }
     setIsLoadingButton(true);
     try {
       const result = await tRPC.updateCarStatus.mutate({
-        carNumber: carNumber,
-        newStatus: newStatus,
+        token: token,
+        updatedStatus: {
+          carNumber: carNumber,
+          newStatus: newStatus,
+        },
       });
       setDataSpecificCar((prevData) => {
         if (prevData) {
@@ -63,8 +87,12 @@ const SpecificCar: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!token) {
+      navigate(`/loginForm`);
+      return;
+    }
     if (params.CarNumber) getSpecificCar(params.CarNumber);
-  }, []);
+  }, [token]);
 
   return (
     <div className=" max-w-md mx-auto pt-20 pb-20 mt-8 p-6 rounded-md shadow-md bg-gray-800 bg-opacity-90">

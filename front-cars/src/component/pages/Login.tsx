@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { LOGIN } from '../../graphQL/schemaUsers';
+import { useAtom, useSetAtom } from 'jotai';
+import { atomName, atomToken } from '../../state/atoms';
 
 const LoginForm = () => {
   const [loginMutation] = useMutation(LOGIN);
   const navigate = useNavigate();
-  const tokenStorage = localStorage.getItem('tokenKey');
+  const [token, setToken] = useAtom(atomToken);
+  const setName = useSetAtom(atomName);
   const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [inputSearchError, setInputSearchError] = useState('');
   const [inputLogin, setInputLogin] = useState({
@@ -16,7 +19,7 @@ const LoginForm = () => {
   });
 
   useEffect(() => {
-    if (tokenStorage) {
+    if (token) {
       navigate('/');
       return;
     }
@@ -40,10 +43,10 @@ const LoginForm = () => {
         },
       });
       const jwt = data.authenticate.jwtToken;
+      const name = data.authenticate.query.userByEmail.name;
       if (jwt) {
-        localStorage.setItem('tokenKey', jwt);
-        const name = data.authenticate.query.userByEmail.name;
-        localStorage.setItem('nameKey', name);
+        setToken(jwt);
+        setName(name);
         navigate('/');
       } else setInputSearchError('Invalid email or password');
     } catch (error) {
