@@ -5,6 +5,7 @@ import { useMutation } from '@apollo/client';
 import { LOGIN } from '../../graphQL/schemaUsers';
 import { useAtom, useSetAtom } from 'jotai';
 import { atomName, atomToken } from '../../state/atoms';
+import { isGraphQLError } from '../../graphQL/errorUtils';
 
 const LoginForm = () => {
   const [loginMutation] = useMutation(LOGIN);
@@ -44,13 +45,25 @@ const LoginForm = () => {
       });
       const jwt = data.authenticate.jwtToken;
       const name = data.authenticate.query.userByEmail.name;
-      if (jwt) {
-        setToken(jwt);
-        setName(name);
-        navigate('/');
-      } else setInputSearchError('Invalid email or password');
+      setToken(jwt);
+      setName(name);
+      navigate('/');
     } catch (error) {
-      console.log('Error login user:', error);
+      if (isGraphQLError(error)) {
+        const graphQLErrors = error.graphQLErrors;
+        if (graphQLErrors && graphQLErrors.length > 0) {
+          const errorMessage = graphQLErrors[0].message;
+          setInputSearchError(errorMessage);
+        } else {
+          setInputSearchError(
+            'An unexpected error occurred while logging in. Try again in a few minutes.'
+          );
+        }
+      } else {
+        setInputSearchError(
+          'An unexpected error occurred while logging in. Try again in a few minutes.'
+        );
+      }
     } finally {
       setIsLoadingButton(false);
     }

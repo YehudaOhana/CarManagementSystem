@@ -1,10 +1,9 @@
-import { GraphQLError } from 'graphql/error';
+import { ApolloError } from '@apollo/client';
 
-export const isGraphQLError = (error: unknown): error is GraphQLError => {
+export const isGraphQLError = (error: unknown): error is ApolloError => {
   return (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    typeof (error as GraphQLError).message === 'string'
+    error instanceof ApolloError &&
+    error.graphQLErrors !== undefined &&
+    error.graphQLErrors.length > 0
   );
 };
