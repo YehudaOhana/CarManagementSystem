@@ -1,6 +1,6 @@
+import chalk from 'chalk';
 import { sequelize } from '../db/postgreSQLConnect';
 import { Car } from '../db/carsModel';
-import chalk from 'chalk';
 import {
   CarInterface,
   newLocationInterface,
@@ -84,7 +84,7 @@ export const updateCarLocationDal = async (
     { where: { car_number: updatedLocation.carNumber } }
   );
   console.log(
-    chalk.yellow(`${updatedLocation.carNumber} status updated successfully!!`)
+    chalk.yellow(`${updatedLocation.carNumber} Location updated successfully!!`)
   );
-  return `Car number '${updatedLocation.carNumber}' status updated to '${updatedLocation.newLocation}' successfully!!`;
+  return `Car number '${updatedLocation.carNumber}' Location updated to '${updatedLocation.newLocation}' successfully!!`;
 };

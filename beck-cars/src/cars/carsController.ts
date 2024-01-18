@@ -6,6 +6,7 @@ import {
   deleteCarService,
   updateCarStatusService,
   addNewCarService,
+  updateCarLocationService,
 } from './carsService';
 
 export const getAllCarsController = publicProcedure
@@ -101,6 +102,34 @@ export const updateCarStatusController = publicProcedure
       return updatedCarStatus;
     } catch (error) {
       console.error('Error in updateCarStatusService procedure:', error);
+      throw error;
+    }
+  });
+
+export const updateCarLocationController = publicProcedure
+  .input(
+    z.object({
+      token: z.string(),
+      updatedLocation: z.object({
+        carNumber: z.string(),
+        newLocation: z.string(),
+      }),
+    })
+  )
+  .mutation(async (opts) => {
+    try {
+      const {
+        token,
+        updatedLocation: { carNumber, newLocation },
+      } = opts.input;
+      const newLocationData = { carNumber, newLocation };
+      const updatedCarLocation = await updateCarLocationService(
+        token,
+        newLocationData
+      );
+      return updatedCarLocation;
+    } catch (error) {
+      console.error('Error in updateCarLocationService procedure:', error);
       throw error;
     }
   });

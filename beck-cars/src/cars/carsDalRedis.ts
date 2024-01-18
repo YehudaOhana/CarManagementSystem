@@ -80,7 +80,7 @@ export const updateCarLocationRedis = async (
     );
     await client.set(cacheKey, JSON.stringify(updatedData));
   } catch (error) {
-    console.error('Error updating car status in Redis:', error);
+    console.error('Error updating car Location in Redis:', error);
     return Promise.reject(error);
   }
 };
