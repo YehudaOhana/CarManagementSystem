@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import React, { ChangeEvent, FormEvent, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { tRPC } from '../../services/tRPCClient';
 import { useAtom } from 'jotai';
 import { atomToken } from '../../state/atoms';
@@ -61,6 +61,13 @@ const AddNewCar: React.FC = () => {
       setIsLoadingButton(false);
     }
   };
+
+  useEffect(() => {
+    if (!token) {
+      navigate(`/loginForm`);
+      return;
+    }
+  }, [token]);
 
   return (
     <div className="max-w-md mx-auto pt-20 pb-20 mt-8 p-6 bg-white rounded-md shadow-md">

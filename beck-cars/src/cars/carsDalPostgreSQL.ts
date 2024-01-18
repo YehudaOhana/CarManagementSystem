@@ -1,7 +1,11 @@
 import { sequelize } from '../db/postgreSQLConnect';
 import { Car } from '../db/carsModel';
 import chalk from 'chalk';
-import { CarInterface, newStatusInterface } from '../interfaces/carInterface';
+import {
+  CarInterface,
+  newLocationInterface,
+  newStatusInterface,
+} from '../interfaces/carInterface';
 
 export const getAllCarsDal = async (token: string) => {
   await sequelize.sync();
@@ -69,4 +73,18 @@ export const updateCarStatusDal = async (
     chalk.yellow(`${updatedStatus.carNumber} status updated successfully!!`)
   );
   return `Car number '${updatedStatus.carNumber}' status updated to '${updatedStatus.newStatus}' successfully!!`;
+};
+
+export const updateCarLocationDal = async (
+  updatedLocation: newLocationInterface,
+  token: string
+) => {
+  await Car.update(
+    { location: updatedLocation.newLocation },
+    { where: { car_number: updatedLocation.carNumber } }
+  );
+  console.log(
+    chalk.yellow(`${updatedLocation.carNumber} status updated successfully!!`)
+  );
+  return `Car number '${updatedLocation.carNumber}' status updated to '${updatedLocation.newLocation}' successfully!!`;
 };

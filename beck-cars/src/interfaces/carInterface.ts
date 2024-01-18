@@ -20,3 +20,8 @@ export interface newStatusInterface {
   carNumber: string;
   newStatus: string;
 }
+
+export interface newLocationInterface {
+  carNumber: string;
+  newLocation: string;
+}

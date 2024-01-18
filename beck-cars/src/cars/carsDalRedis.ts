@@ -1,4 +1,8 @@
-import { newStatusInterface } from '../interfaces/carInterface';
+import {
+  CarInterface,
+  newLocationInterface,
+  newStatusInterface,
+} from '../interfaces/carInterface';
 import { client } from '../redis/connectRedis';
 import { getAllCarsDal } from './carsDalPostgreSQL';
 
@@ -52,6 +56,26 @@ export const updateCarStatusRedis = async (
     const updatedData = allCarRedis.map((car) =>
       car.carNumber === updatedStatus.carNumber
         ? { ...car, status: updatedStatus.newStatus }
+        : car
+    );
+    await client.set(cacheKey, JSON.stringify(updatedData));
+  } catch (error) {
+    console.error('Error updating car status in Redis:', error);
+    return Promise.reject(error);
+  }
+};
+
+export const updateCarLocationRedis = async (
+  updatedLocation: newLocationInterface,
+  token: string
+) => {
+  const cacheKey = 'specificCarList';
+  try {
+    const cachedData = await client.get(cacheKey);
+    const allCarRedis = cachedData ? JSON.parse(cachedData) : [];
+    const updatedData = allCarRedis.map((car: CarInterface) =>
+      car.carNumber === updatedLocation.carNumber
+        ? { ...car, status: updatedLocation.newLocation }
         : car
     );
     await client.set(cacheKey, JSON.stringify(updatedData));

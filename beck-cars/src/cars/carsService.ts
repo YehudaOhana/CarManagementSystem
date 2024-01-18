@@ -1,15 +1,21 @@
-import { CarInterface, newStatusInterface } from '../interfaces/carInterface';
-import { checkToken } from '../tokenConection';
+import {
+  CarInterface,
+  newLocationInterface,
+  newStatusInterface,
+} from '../interfaces/carInterface';
+import { checkToken } from '../tokenConnection';
 import {
   addNewCarDal,
   deleteCarDal,
   getAllCarsDal,
   getSpecificCarDal,
+  updateCarLocationDal,
   updateCarStatusDal,
 } from './carsDalPostgreSQL';
 import {
   deleteCarRedis,
   getSpecificCarRedis,
+  updateCarLocationRedis,
   updateCarStatusRedis,
 } from './carsDalRedis';
 import chalk from 'chalk';
@@ -58,6 +64,7 @@ export const deleteCarService = async (carNumber: string, token: string) => {
   const deletedCarRedis = await deleteCarRedis(carNumber, token);
   return { DB: deletedCarDB, Redis: deletedCarRedis };
 };
+
 export const updateCarStatusService = async (
   token: string,
   updatedStatus: newStatusInterface
@@ -68,4 +75,19 @@ export const updateCarStatusService = async (
     token
   );
   return { DB: updatedCarStatusDB, Redis: updatedCarStatusRedis };
+};
+
+export const updateCarLocationService = async (
+  token: string,
+  updatedLocation: newLocationInterface
+) => {
+  const updatedCarLocationDB = await updateCarLocationDal(
+    updatedLocation,
+    token
+  );
+  const updatedCarLocationRedis = await updateCarLocationRedis(
+    updatedLocation,
+    token
+  );
+  return { DB: updatedCarLocationDB, Redis: updatedCarLocationRedis };
 };
