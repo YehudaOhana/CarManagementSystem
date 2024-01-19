@@ -3,15 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { LOGIN } from '../../graphQL/schemaUsers';
-import { useAtom, useSetAtom } from 'jotai';
-import { atomName, atomToken } from '../../state/atoms';
 import { isGraphQLError } from '../../graphQL/errorUtils';
 
 const LoginForm = () => {
   const [loginMutation] = useMutation(LOGIN);
   const navigate = useNavigate();
-  const [token, setToken] = useAtom(atomToken);
-  const setName = useSetAtom(atomName);
+  const token = localStorage.getItem('token');
   const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [inputSearchError, setInputSearchError] = useState('');
   const [inputLogin, setInputLogin] = useState({
@@ -43,10 +40,10 @@ const LoginForm = () => {
           password: inputLogin.password,
         },
       });
-      const jwt = data.authenticate.jwtToken;
-      const name = data.authenticate.query.userByEmail.name;
-      setToken(jwt);
-      setName(name);
+      const jwt: string = data.authenticate.jwtToken;
+      const name: string = data.authenticate.query.userByEmail.name;
+      localStorage.setItem('token', jwt);
+      localStorage.setItem('name', name);
       navigate('/');
     } catch (error) {
       if (isGraphQLError(error)) {

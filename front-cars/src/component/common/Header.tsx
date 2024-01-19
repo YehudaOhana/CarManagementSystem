@@ -1,8 +1,6 @@
-import { useAtom } from 'jotai';
 import { tRPC } from '../../services/tRPCClient';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { atomName, atomToken } from '../../state/atoms';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -12,8 +10,8 @@ const Header = () => {
   const [titleIsConnected, setTitleIsConnected] = useState('Login');
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [isLoadingButton, setIsLoadingButton] = useState(false);
-  const [token, setToken] = useAtom(atomToken);
-  const [name, setName] = useAtom(atomName);
+  const token = localStorage.getItem('token');
+  const name = localStorage.getItem('name');
 
   const handleIconClick = () => {
     setRotation(rotation + 99999999999999);
@@ -23,15 +21,17 @@ const Header = () => {
     if (inputSearch === '') return setInputSearchError('Enter Car Number');
     setIsLoadingButton(true);
     try {
-      const res = await tRPC.getSpecificCar.query({
-        carNumber: inputSearch,
-        token: token,
-      });
-      if (res && res.carNumber === inputSearch) {
-        navigate(`specificCar/${inputSearch}`);
-        setInputSearchError('');
-        setInputSearch('');
-      } else setInputSearchError(`Not Found Car`);
+      if (token) {
+        const res = await tRPC.getSpecificCar.query({
+          carNumber: inputSearch,
+          token: token,
+        });
+        if (res && res.carNumber === inputSearch) {
+          navigate(`specificCar/${inputSearch}`);
+          setInputSearchError('');
+          setInputSearch('');
+        } else setInputSearchError(`Not Found Car`);
+      }
     } catch (error) {
       setInputSearchError(`Not Found Car`);
     } finally {
@@ -48,8 +48,8 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    setToken('');
-    setName('');
+    localStorage.setItem('token', '');
+    localStorage.setItem('name', '');
     setShowLogoutConfirmation(false);
     navigate('/loginForm');
   };

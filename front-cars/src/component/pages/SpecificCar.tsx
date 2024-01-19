@@ -3,9 +3,6 @@ import { tRPC } from '../../services/tRPCClient';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { PropagateLoader } from 'react-spinners';
-import { useAtom } from 'jotai';
-import { atomToken } from '../../state/atoms';
-
 const SpecificCar: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingButton, setIsLoadingButton] = useState(false);
@@ -15,7 +12,9 @@ const SpecificCar: React.FC = () => {
   );
   const params = useParams<{ CarNumber: string }>();
   const navigate = useNavigate();
-  const [token] = useAtom(atomToken);
+  const token = localStorage.getItem('token');
+  const [newLocation, setNewLocation] = useState('');
+  const [isLocationEditable, setIsLocationEditable] = useState(false);
 
   const getSpecificCar = async (CarNumber: string) => {
     if (!token) {
@@ -86,11 +85,39 @@ const SpecificCar: React.FC = () => {
     }
   };
 
-  useEffect(() => {
+  const handleUpdateLocation = async (
+    carNumber: string,
+    newLocation: string
+  ) => {
     if (!token) {
       navigate(`/loginForm`);
       return;
     }
+    setIsLoadingButton(true);
+    try {
+      const result = await tRPC.updateCarLocation.mutate({
+        token: token,
+        updatedLocation: {
+          carNumber: carNumber,
+          newLocation: newLocation,
+        },
+      });
+      setDataSpecificCar((prevData) => {
+        if (prevData) {
+          return { ...prevData, location: newLocation };
+        }
+        return null;
+      });
+      setIsLocationEditable(false);
+      return result;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoadingButton(false);
+    }
+  };
+
+  useEffect(() => {
     if (params.CarNumber) getSpecificCar(params.CarNumber);
   }, [token]);
 
@@ -120,8 +147,28 @@ const SpecificCar: React.FC = () => {
             driver: {dataSpecificCar.driver}
           </p>
           <p className="text-gray-300 text-2xl">
-            location: {dataSpecificCar.location}
+            location:{' '}
+            {isLocationEditable ? (
+              <input
+                type="text"
+                value={newLocation}
+                className=" text-cyan-500"
+                onChange={(e) => setNewLocation(e.target.value)}
+                onBlur={() =>
+                  handleUpdateLocation(dataSpecificCar.carNumber, newLocation)
+                }
+                autoFocus
+              />
+            ) : (
+              <span
+                onClick={() => setIsLocationEditable(true)}
+                className="hover:cursor-pointer text-cyan-500"
+              >
+                {dataSpecificCar.location}
+              </span>
+            )}
           </p>
+
           <p className="text-gray-300 text-2xl">
             status: {dataSpecificCar.status}
           </p>

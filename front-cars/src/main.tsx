@@ -1,7 +1,6 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { Provider as JotaiProvider } from 'jotai';
 import App from './app/app';
 import { ApolloProvider } from '@apollo/client';
 import apolloClient from './services/apolloClient';
@@ -13,11 +12,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <StrictMode>
     <BrowserRouter>
-      <JotaiProvider>
-        <ApolloProvider client={apolloClient}>
-          <App />
-        </ApolloProvider>
-      </JotaiProvider>
+      <ApolloProvider client={apolloClient}>
+        <App />
+      </ApolloProvider>
     </BrowserRouter>
   </StrictMode>
 );

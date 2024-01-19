@@ -4,14 +4,12 @@ import { tRPC } from '../../services/tRPCClient';
 import CreateCardCars from '../common/CreateCardCar';
 import { CarInterface } from 'beck-cars/src/interfaces/carInterface';
 import { useNavigate } from 'react-router-dom';
-import { useAtom } from 'jotai';
-import { atomToken } from '../../state/atoms';
 
 const HomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [dataAllCars, setDataAllCars] = useState<CarInterface[]>([]);
   const navigate = useNavigate();
-  const [token] = useAtom(atomToken);
+  const token = localStorage.getItem('token');
 
   const getAllCars = async () => {
     if (!token) {
@@ -101,11 +99,6 @@ const HomePage: React.FC = () => {
             />
           ))}
         </div>
-      )}
-      {dataAllCars.length < 1 && (
-        <h1 className="flex justify-center items-start  h-screen pt-20 mt-20 text-9xl  text-red-600">
-          Not Networking
-        </h1>
       )}
     </div>
   );

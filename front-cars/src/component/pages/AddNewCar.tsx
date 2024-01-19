@@ -1,12 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { tRPC } from '../../services/tRPCClient';
-import { useAtom } from 'jotai';
-import { atomToken } from '../../state/atoms';
 
 const AddNewCar: React.FC = () => {
   const navigate = useNavigate();
-  const [token] = useAtom(atomToken);
+  const token = localStorage.getItem('token');
   const [inputNewCarError, setInputNewCarError] = useState('');
   const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [inputNewCar, setInputNewCar] = useState({
