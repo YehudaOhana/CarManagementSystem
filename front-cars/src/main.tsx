@@ -5,25 +5,25 @@ import App from './app/app';
 import { ApolloProvider } from '@apollo/client';
 import apolloClient from './services/apolloClient';
 import { configureStore } from '@reduxjs/toolkit';
-import { Provider as ProviderRedux}  from 'react-redux' 
-import dataSlice from './features/dataSlice';
+import { Provider as ProviderRedux } from 'react-redux';
+import dataSlice from './features/slices';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
 const storeRedux = configureStore({
-reducer: {
-  dataSlice
-}
-})
+  reducer: {
+    dataSlice,
+  },
+});
 
 root.render(
   <StrictMode>
     <BrowserRouter>
       <ApolloProvider client={apolloClient}>
         <ProviderRedux store={storeRedux}>
-        <App />
+          <App />
         </ProviderRedux>
       </ApolloProvider>
     </BrowserRouter>

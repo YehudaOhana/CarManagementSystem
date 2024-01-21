@@ -6,7 +6,12 @@ const dataValue = {
 const dataSlice = createSlice({
   name: 'dataSliceName',
   initialState: dataValue,
-  reducers: {},
+  reducers: {
+    updateState: (state, action) => {
+      state.dataSliceName = action.payload.stateVal;
+    },
+  },
 });
 
+export const { updateState } = dataSlice.actions;
 export default dataSlice.reducer;
