@@ -4,11 +4,13 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { LOGIN } from '../../graphQL/schemaUsers';
 import { isGraphQLError } from '../../graphQL/errorUtils';
+import { useSelector } from 'react-redux';
 
 const LoginForm = () => {
   const [loginMutation] = useMutation(LOGIN);
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  // const token = localStorage.getItem('token');
+  const token = useSelector((storeRedux) => storeRedux.dataSlice.dataSliceName)
   const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [inputSearchError, setInputSearchError] = useState('');
   const [inputLogin, setInputLogin] = useState({
@@ -17,6 +19,8 @@ const LoginForm = () => {
   });
 
   useEffect(() => {
+    console.log("tokenn", token);
+    
     if (token) {
       navigate('/');
       return;
@@ -42,8 +46,10 @@ const LoginForm = () => {
       });
       const jwt: string = data.authenticate.jwtToken;
       const name: string = data.authenticate.query.userByEmail.name;
+      const email: string = data.authenticate.query.userByEmail.email;
       localStorage.setItem('token', jwt);
       localStorage.setItem('name', name);
+      localStorage.setItem('email', email);
       navigate('/');
     } catch (error) {
       if (isGraphQLError(error)) {

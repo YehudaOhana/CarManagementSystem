@@ -14,8 +14,6 @@ import locationIcon from '../../images/locationIcon.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { CarInterface } from 'beck-cars/src/interfaces/carInterface';
 import { tRPC } from '../../services/tRPCClient';
-
-// Import Axios for making HTTP requests
 import axios from 'axios';
 
 const coords: Record<string, Coordinate> = {
@@ -28,7 +26,6 @@ interface CarInterfaceCoordinate extends CarInterface {
 
 function Map(): JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
-  const [dataAllCars, setDataAllCars] = useState<CarInterfaceCoordinate[]>([]);
   const [geoCodedCars, setGeoCodedCars] = useState<CarInterfaceCoordinate[]>(
     []
   );
@@ -38,18 +35,21 @@ function Map(): JSX.Element {
   const geoCodeLocation = async (location: string) => {
     try {
       const response = await axios.get(
-        `https://geocode.maps.co/search?q=${location}&api_key=${process.env.OPENCAGE_API_KEY}`
+        // change path to env
+        `https://geocode.maps.co/search?q=${location}&api_key=65ac353ee1b42835870604gai352b14`,
+        {
+          timeout: 1000,
+        }
       );
 
-      const data = response.data;
+      // if (data.results && data.results.length > 0 && data.results[0].geometry) {
+      const { lat, lon } = response.data[0];
 
-      if (data.results && data.results.length > 0 && data.results[0].geometry) {
-        const { lat, lng } = data.results[0].geometry;
-        return fromLonLat([lng, lat]);
-      } else {
-        console.error(`Geocoding failed for location: ${location}`);
-        return null;
-      }
+      return fromLonLat([lon, lat]);
+      // } else {
+      //   console.error(`Geocoding failed for location: ${location}`);
+      //   return null;
+      // }
     } catch (error) {
       console.error('Error geocoding location:', error);
       return null;
@@ -63,13 +63,15 @@ function Map(): JSX.Element {
     }
     try {
       setIsLoading(true);
-      const res = await tRPC.getAllCars.query(token);
-      if (res !== 'Not Data' && res !== undefined) {
-        setDataAllCars(res);
+      const allCars = await tRPC.getAllCars.query(token);
+      if (allCars !== 'Not Data' && allCars !== undefined) {
+        const geoCodedCars = await Promise.all(
+          allCars.map(async (car) => {
+            console.log('car', car);
 
-        const geocodedCars = await Promise.all(
-          res.map(async (car) => {
             const carCoordinates = await geoCodeLocation(car.location);
+            console.log('kjck', carCoordinates);
+
             return carCoordinates
               ? {
                   ...car,
@@ -78,9 +80,8 @@ function Map(): JSX.Element {
               : null;
           })
         );
-
         setGeoCodedCars(
-          geocodedCars.filter((car) => car !== null) as CarInterfaceCoordinate[]
+          geoCodedCars.filter((car) => car !== null) as CarInterfaceCoordinate[]
         );
       }
     } catch (error) {
@@ -92,16 +93,19 @@ function Map(): JSX.Element {
 
   useEffect(() => {
     displayCarsOnMap();
-  }, []); // Make sure to run this only once when the component mounts
+  }, []);
 
+  useEffect(() => {
+    console.log('geo', geoCodedCars);
+  }, [geoCodedCars]);
   return (
-    <>
+    <div className="py-20">
       <RMap
         className="w-full h-[1000px]"
         initial={{ center: fromLonLat(coords.origin), zoom: 11 }}
       >
-        {/* Replace the Google Maps layer with OpenStreetMap */}
-        <RLayerTile url="http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}" />
+        {/* <RLayerTile url="http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}" /> */}
+        <RLayerTile url="http://mt0.google.com/vt/lyrs=m&hl=he&x={x}&y={y}&z={z}" />
         <RLayerVector zIndex={10}>
           <RStyle.RStyle>
             <RStyle.RIcon src={locationIcon} scale={0.08} anchor={[0.5, 0.8]} />
@@ -121,10 +125,10 @@ function Map(): JSX.Element {
           ))}
         </RLayerVector>
       </RMap>
-      <Link to={`/`} className="block mt-4 text-white hover:text-yellow-500">
+      <Link to={`/`} className="block mt-4 text-yellow-500 hover:text-white">
         Return to home page
       </Link>
-    </>
+    </div>
   );
 }
 

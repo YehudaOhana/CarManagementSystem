@@ -14,6 +14,7 @@ export const LOGIN = gql`
       query {
         userByEmail(email: $email) {
           name
+          email
         }
       }
       jwtToken
