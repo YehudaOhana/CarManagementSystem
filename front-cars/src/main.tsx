@@ -6,7 +6,7 @@ import { ApolloProvider } from '@apollo/client';
 import apolloClient from './services/apolloClient';
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider as ProviderRedux}  from 'react-redux' 
-import dataSlice from './features/dataSlice';
+import dataSlice from './features/userSlice';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
