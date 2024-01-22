@@ -7,6 +7,7 @@ import apolloClient from './services/apolloClient';
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider as ProviderRedux}  from 'react-redux' 
 import userSlice from './features/userSlice';
+import mapSlice from './features/mapSlice';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -15,6 +16,7 @@ const root = ReactDOM.createRoot(
 const storeRedux = configureStore({
   reducer: {
     userSlice,
+    mapSlice
   },
 });
 

@@ -1,5 +1,5 @@
 import 'symbol-observable';
-import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   userName: '',
