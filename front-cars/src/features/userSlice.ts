@@ -1,12 +1,24 @@
-import { createSlice } from '@reduxjs/toolkit';
+import 'symbol-observable';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-const dataValue = {
-  dataSliceName: '',
+const initialState = {
+  userName: '',
+  userEmail: '',
 };
-const dataSlice = createSlice({
-  name: 'dataSliceName',
-  initialState: dataValue,
-  reducers: {},
+
+const userSlice = createSlice({
+  name: 'userSliceName',
+  initialState,
+  reducers: {
+    setName: (state, action) => {
+      state.userName = action.payload.name;
+    },
+    setEmail: (state, action) => {
+      state.userEmail = action.payload.email;
+    },
+  },
 });
 
-export default dataSlice.reducer;
+export const { setName, setEmail } = userSlice.actions;
+
+export default userSlice.reducer;

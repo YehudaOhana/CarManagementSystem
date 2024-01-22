@@ -1,7 +1,10 @@
+import { Buffer } from 'buffer';
+import { setEmail, setName } from '../../features/userSlice';
+import { RootState } from '../../main';
 import { tRPC } from '../../services/tRPCClient';
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-
 const Header = () => {
   const navigate = useNavigate();
   const [rotation, setRotation] = useState(0);
@@ -10,8 +13,11 @@ const Header = () => {
   const [titleIsConnected, setTitleIsConnected] = useState('Login');
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [isLoadingButton, setIsLoadingButton] = useState(false);
+  const dispatch = useDispatch();
   const token = localStorage.getItem('token');
-  const name = localStorage.getItem('name');
+  const nameFromRedux = useSelector(
+    (storeRedux: RootState) => storeRedux.userSlice.userName
+  );
 
   const handleIconClick = () => {
     setRotation(rotation + 99999999999999);
@@ -48,8 +54,9 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    localStorage.setItem('token', '');
-    localStorage.setItem('name', '');
+    localStorage.removeItem('token');
+    dispatch(setName({ name: '' }));
+    dispatch(setEmail({ email: '' }));
     setShowLogoutConfirmation(false);
     navigate('/loginForm');
   };
@@ -59,8 +66,14 @@ const Header = () => {
   };
 
   useEffect(() => {
-    if (token && name) {
-      setTitleIsConnected(name);
+    if (token && nameFromRedux) {
+      setTitleIsConnected(nameFromRedux);
+    } else if (token) {
+      const [headerBase64, payloadBase64, signatureBase64] = token.split('.');
+      const nameFromToken = JSON.parse(
+        Buffer.from(payloadBase64, 'base64').toString('utf-8')
+      ).name;
+      setTitleIsConnected(nameFromToken);
     } else {
       setTitleIsConnected('Login');
     }
