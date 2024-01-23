@@ -1,20 +1,27 @@
 import 'symbol-observable';
-import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  statusState: 'status 1',
+  statusState: 1,
+  scoundSate: 'hi'
 };
 
 const mapSlice = createSlice({
   name: 'mapSliceName',
   initialState,
   reducers: {
-    setStatus: (state, action) => {
-      state.statusState = action.payload.newStatus;
+    add1: (state) => {
+      state.statusState++;
+    },
+    reset: (state) => {
+      state.statusState = 0;
+    },
+    addCustom: (state, action) => {
+      state.statusState += action.payload.custom;
     },
   },
 });
 
-export const { setStatus } = mapSlice.actions;
+export const { add1, reset, addCustom } = mapSlice.actions;
 
 export default mapSlice.reducer;

@@ -70,7 +70,7 @@
 //             console.log('car', car);
 
 //             const carCoordinates = await geoCodeLocation(car.location);
-//             console.log('kjck', carCoordinates);
+//             console.log('carCoordinates', carCoordinates);
 
 //             return carCoordinates
 //               ? {
@@ -134,18 +134,46 @@
 
 // export default Map;
 
+import { add1, reset, addCustom } from '../../features/mapSlice';
 import { RootState } from '../../main';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const MapCars: React.FC = () => {
-  const testRedux = useSelector(
-    (storeRedux: RootState) => storeRedux.mapSlice.statusState
-  );
+  let a: number = 1;
+  let b: string = 'hello world';
+  const hello = () => console.log(a++, b);
+
+  const welcome = () => hello();
+
+  welcome();
+
+  const dispatch = useDispatch();
+  const testRedux = useSelector((storeRedux: RootState) => storeRedux.mapSlice);
   return (
     <div className="h-screen pt-20">
       <div className="container mx-auto py-20 grid gap-4 lg:grid-cols-5">
-        <h1 className="text-red-500  text-9xl">{testRedux}</h1>
+        <h1 className="text-red-500  text-9xl">
+          {testRedux.statusState} {testRedux.scoundSate}
+        </h1>
+        <button
+          className="text-red-500  text-5xl"
+          onClick={() => dispatch(add1())}
+        >
+          add 1
+        </button>
+        <button
+          className="text-red-500  text-5xl"
+          onClick={() => dispatch(reset())}
+        >
+          reset
+        </button>
+        <button
+          className="text-red-500  text-5xl"
+          onClick={() => dispatch(addCustom({ custom: -2 }))}
+        >
+          add custom
+        </button>
         <Link to={`/`} className="block mt-4 text-white hover:text-yellow-500">
           Return to home page
         </Link>
