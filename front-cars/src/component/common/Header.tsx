@@ -1,10 +1,10 @@
 import { Buffer } from 'buffer';
-import { setEmail, setName } from '../../features/userSlice';
-import { RootState } from '../../main';
+import { setEmail, setName } from '../../redux/features/userSlice';
 import { tRPC } from '../../services/tRPCClient';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+
 const Header = () => {
   const navigate = useNavigate();
   const [rotation, setRotation] = useState(0);
@@ -13,10 +13,10 @@ const Header = () => {
   const [titleIsConnected, setTitleIsConnected] = useState('Login');
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [isLoadingButton, setIsLoadingButton] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const token = localStorage.getItem('token');
-  const nameFromRedux = useSelector(
-    (storeRedux: RootState) => storeRedux.userSlice.userName
+  const nameFromRedux = useAppSelector(
+    (storeRedux) => storeRedux.userSlice.userName
   );
 
   const handleIconClick = () => {

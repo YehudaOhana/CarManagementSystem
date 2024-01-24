@@ -134,28 +134,22 @@
 
 // export default Map;
 
-import { add1, reset, addCustom } from '../../features/mapSlice';
-import { RootState } from '../../main';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { add1, reset, addCustom } from '../../redux/features/mapSlice';
 import { Link } from 'react-router-dom';
 
 const MapCars: React.FC = () => {
-  let a: number = 1;
-  let b: string = 'hello world';
-  const hello = () => console.log(a++, b);
-
+  const a: number = 1;
+  const hello = () => console.log(a);
   const welcome = () => hello();
-
   welcome();
 
-  const dispatch = useDispatch();
-  const testRedux = useSelector((storeRedux: RootState) => storeRedux.mapSlice);
+  const dispatch = useAppDispatch();
+  const testRedux = useAppSelector((storeRedux) => storeRedux.mapSlice);
   return (
     <div className="h-screen pt-20">
       <div className="container mx-auto py-20 grid gap-4 lg:grid-cols-5">
-        <h1 className="text-red-500  text-9xl">
-          {testRedux.statusState} {testRedux.scoundSate}
-        </h1>
+        <h1 className="text-red-500  text-9xl">{testRedux.statusState}</h1>
         <button
           className="text-red-500  text-5xl"
           onClick={() => dispatch(add1())}
@@ -170,7 +164,7 @@ const MapCars: React.FC = () => {
         </button>
         <button
           className="text-red-500  text-5xl"
-          onClick={() => dispatch(addCustom({ custom: -2 }))}
+          onClick={() => dispatch(addCustom(-2))}
         >
           add custom
         </button>

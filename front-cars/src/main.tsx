@@ -4,33 +4,21 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './app/app';
 import { ApolloProvider } from '@apollo/client';
 import apolloClient from './services/apolloClient';
-import { configureStore } from '@reduxjs/toolkit';
-import { Provider as ProviderRedux}  from 'react-redux' 
-import userSlice from './features/userSlice';
-import mapSlice from './features/mapSlice';
+import { Provider as ReduxProvider } from 'react-redux';
+import { store as storeRedux } from './redux/store';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-const storeRedux = configureStore({
-  reducer: {
-    userSlice,
-    mapSlice
-  },
-});
-
-export type RootState = ReturnType<typeof storeRedux.getState>;
-
 root.render(
   <StrictMode>
     <BrowserRouter>
       <ApolloProvider client={apolloClient}>
-        <ProviderRedux store={storeRedux}>
+        <ReduxProvider store={storeRedux}>
           <App />
-        </ProviderRedux>
+        </ReduxProvider>
       </ApolloProvider>
     </BrowserRouter>
   </StrictMode>
 );
-

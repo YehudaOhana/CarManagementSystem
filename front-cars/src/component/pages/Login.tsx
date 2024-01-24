@@ -4,15 +4,14 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { LOGIN } from '../../graphQL/schemaUsers';
 import { isGraphQLError } from '../../graphQL/errorUtils';
-import { useDispatch } from 'react-redux';
-import { setName, setEmail } from '../../features/userSlice';
+import { setName, setEmail } from '../../redux/features/userSlice';
+import { useAppDispatch } from '../../redux/hooks';
+
 const LoginForm = () => {
   const [loginMutation] = useMutation(LOGIN);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
-  // const name = useSelector((storeRedux) => storeRedux.userSlice.userName);
-  // const email = useSelector((storeRedux) => storeRedux.userSlice.userEmail);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch()
   const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [inputSearchError, setInputSearchError] = useState('');
   const [inputLogin, setInputLogin] = useState({

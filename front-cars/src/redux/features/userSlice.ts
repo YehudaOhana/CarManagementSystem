@@ -1,7 +1,12 @@
 import 'symbol-observable';
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
+interface initialStateInterface{
+  userName:string
+  userEmail:string
+}
+
+const initialState:initialStateInterface = {
   userName: '',
   userEmail: '',
 };
