@@ -139,11 +139,6 @@ import { add1, reset, addCustom } from '../../redux/features/mapSlice';
 import { Link } from 'react-router-dom';
 
 const MapCars: React.FC = () => {
-  const a: number = 1;
-  const hello = () => console.log(a);
-  const welcome = () => hello();
-  welcome();
-
   const dispatch = useAppDispatch();
   const testRedux = useAppSelector((storeRedux) => storeRedux.mapSlice);
   return (
