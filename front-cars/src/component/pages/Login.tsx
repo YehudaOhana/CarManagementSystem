@@ -5,14 +5,17 @@ import { useMutation } from '@apollo/client';
 import { LOGIN } from '../../graphQL/schemaUsers';
 import { isGraphQLError } from '../../graphQL/errorUtils';
 import { setName, setEmail } from '../../redux/features/userSlice';
-import { useAppDispatch } from '../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import {loginMutation} from '../../redux/service/mutation';
 
 const LoginForm = () => {
-  const [loginMutation] = useMutation(LOGIN);
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
-  const dispatch = useAppDispatch()
-  const [isLoadingButton, setIsLoadingButton] = useState(false);
+  // const [loginMutation] = useMutation(LOGIN);
+  const { error, userName, loading } = useAppSelector(
+    (store) => store.userSlice
+  );
+  const dispatch = useAppDispatch();
+  // const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [inputSearchError, setInputSearchError] = useState('');
   const [inputLogin, setInputLogin] = useState({
     email: '',
@@ -20,11 +23,11 @@ const LoginForm = () => {
   });
 
   useEffect(() => {
-    if (token) {
+    if (userName) {
       navigate('/');
       return;
     }
-  }, []);
+  }, [userName]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputLogin({
@@ -34,41 +37,41 @@ const LoginForm = () => {
   };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsLoadingButton(true);
+    // setIsLoadingButton(true);
     e.preventDefault();
-    try {
-      const { data } = await loginMutation({
-        variables: {
-          email: inputLogin.email,
-          password: inputLogin.password,
-        },
-      });
-      const jwtToken: string = data.authenticate.jwtToken;
-      const name: string = data.authenticate.query.userByEmail.name;
-      const email: string = data.authenticate.query.userByEmail.email;
-      localStorage.setItem('token', jwtToken);
-      dispatch(setName({ name: name }));
-      dispatch(setEmail({ email: email }));
-      navigate('/');
-    } catch (error) {
-      if (isGraphQLError(error)) {
-        const graphQLErrors = error.graphQLErrors;
-        if (graphQLErrors && graphQLErrors.length > 0) {
-          const errorMessage = graphQLErrors[0].message;
-          setInputSearchError(errorMessage);
-        } else {
-          setInputSearchError(
-            'An unexpected error occurred while logging in. Try again in a few minutes.'
-          );
-        }
-      } else {
-        setInputSearchError(
-          'An unexpected error occurred while logging in. Try again in a few minutes.'
-        );
-      }
-    } finally {
-      setIsLoadingButton(false);
-    }
+    dispatch(loginMutation(inputLogin));
+    // try {
+    //   const { data } = await loginMutation({
+    //     variables: {
+    //       email: inputLogin.email,
+    //       password: inputLogin.password,
+    //     },
+    //   });
+    //   const jwtToken: string = data.authenticate.jwtToken;
+    //   const name: string = data.authenticate.query.userByEmail.name;
+    //   const email: string = data.authenticate.query.userByEmail.email;
+    //   localStorage.setItem('token', jwtToken);
+    //   dispatch(setName({ name: name }));
+    //   dispatch(setEmail({ email: email }));
+    // } catch (error) {
+    //   if (isGraphQLError(error)) {
+    //     const graphQLErrors = error.graphQLErrors;
+    //     if (graphQLErrors && graphQLErrors.length > 0) {
+    //       const errorMessage = graphQLErrors[0].message;
+    //       setInputSearchError(errorMessage);
+    //     } else {
+    //       setInputSearchError(
+    //         'An unexpected error occurred while logging in. Try again in a few minutes.'
+    //       );
+    //     }
+    //   } else {
+    //     setInputSearchError(
+    //       'An unexpected error occurred while logging in. Try again in a few minutes.'
+    //     );
+    //   }
+    // } finally {
+    //   setIsLoadingButton(false);
+    // }
   };
 
   return (
@@ -115,7 +118,7 @@ const LoginForm = () => {
             type="submit"
             className="bg-cyan-500 text-white py-2 px-4 rounded-md hover:bg-blue-400 focus:outline-none focus:bg-blue-600"
           >
-            {isLoadingButton && (
+            {loading && (
               <svg
                 className="inline w-6 h-6 text-black animate-spin"
                 aria-hidden="true"
@@ -134,7 +137,7 @@ const LoginForm = () => {
                 />
               </svg>
             )}
-            {isLoadingButton ? '' : 'Login'}
+            {loading ? '' : 'Login'}
           </button>
         </form>
         <Link

@@ -12,7 +12,7 @@ export const getSpecificCarRedis = async (carNumber: string, token: string) => {
     const cachedData = await client.get(cacheKey);
     const allCarRedis = cachedData ? JSON.parse(cachedData) : [];
     const specificCarRedis = allCarRedis.find(
-      (car) => car.carNumber === carNumber
+      (car: { carNumber: string; }) => car.carNumber === carNumber
     );
     if (specificCarRedis) {
       return specificCarRedis;
@@ -26,7 +26,7 @@ export const getSpecificCarRedis = async (carNumber: string, token: string) => {
     return specificCarDB;
   } catch (error) {
     console.error('Error fetching or updating cache:', error);
-    return Promise.reject(error);
+    return error
   }
 };
 
@@ -36,12 +36,12 @@ export const deleteCarRedis = async (carNumber: string, token: string) => {
     const cachedData = await client.get(cacheKey);
     const allCarRedis = cachedData ? JSON.parse(cachedData) : [];
     const updatedData = allCarRedis.filter(
-      (car) => car.carNumber !== carNumber
+      (car: { carNumber: string; }) => car.carNumber !== carNumber
     );
     await client.set(cacheKey, JSON.stringify(updatedData));
   } catch (error) {
     console.error('Error deleting car from Redis:', error);
-    return Promise.reject(error);
+    return error
   }
 };
 
@@ -53,7 +53,7 @@ export const updateCarStatusRedis = async (
   try {
     const cachedData = await client.get(cacheKey);
     const allCarRedis = cachedData ? JSON.parse(cachedData) : [];
-    const updatedData = allCarRedis.map((car) =>
+    const updatedData = allCarRedis.map((car: { carNumber: string; }) =>
       car.carNumber === updatedStatus.carNumber
         ? { ...car, status: updatedStatus.newStatus }
         : car
@@ -61,7 +61,7 @@ export const updateCarStatusRedis = async (
     await client.set(cacheKey, JSON.stringify(updatedData));
   } catch (error) {
     console.error('Error updating car status in Redis:', error);
-    return Promise.reject(error);
+    return error
   }
 };
 
@@ -81,6 +81,6 @@ export const updateCarLocationRedis = async (
     await client.set(cacheKey, JSON.stringify(updatedData));
   } catch (error) {
     console.error('Error updating car Location in Redis:', error);
-    return Promise.reject(error);
+    return error
   }
 };
